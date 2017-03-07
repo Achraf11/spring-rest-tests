@@ -1,6 +1,7 @@
 package com.worldline.fpl.recruitment.exception;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import com.worldline.fpl.recruitment.json.ErrorCode;
 
@@ -15,10 +16,12 @@ public class ServiceException extends RuntimeException {
 	private static final long serialVersionUID = 8303256484065597037L;
 
 	@Getter
-	private final ErrorCode errorCode;
+	@Setter
+	private ErrorCode errorCode;
 
 	@Getter
-	private final String message;
+	@Setter
+	private String message;
 
 	public ServiceException(ErrorCode errorCode) {
 		this(errorCode, null);
