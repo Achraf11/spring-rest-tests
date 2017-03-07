@@ -11,9 +11,11 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.worldline.fpl.recruitment.entity.Transaction;
 import com.worldline.fpl.recruitment.json.ErrorResponse;
 import com.worldline.fpl.recruitment.json.TransactionResponse;
 
@@ -38,7 +40,7 @@ public interface AdminTransactionController {
 	 *            the pageable information
 	 * @return the transaction list
 	 */
-	@RequestMapping(value = "{transactionId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/{transactionId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Delete transaction related to an account by id", response = TransactionResponse.class, responseContainer = "transactionDeleted")
 	@ApiResponses({
 			@ApiResponse(code = 204, message = "No transactions", response = ErrorResponse.class),
@@ -48,4 +50,14 @@ public interface AdminTransactionController {
 			@ApiParam("Pageable information") @PageableDefault Pageable p,
 			@ApiParam("Transaction ID") @PathVariable("transactionId") String transactionId);
 
+	@RequestMapping(value = "", method = RequestMethod.POST)
+	ResponseEntity<Transaction> createTransaction(
+			@PathVariable("accountId") String accountId,
+			@RequestBody Transaction transaction);
+
+	@RequestMapping(value = "/{transactionId}", method = RequestMethod.PUT)
+	ResponseEntity<Transaction> updateTransaction(
+			@PathVariable("accountId") String accountId,
+			@PathVariable("transactionId") String transactionId,
+			@RequestBody Transaction updateTransaction);
 }

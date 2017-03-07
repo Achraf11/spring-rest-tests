@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -84,4 +85,19 @@ public class TransactionRepositoryImpl implements TransactionRepository,
 				a -> a.getId().equals(transactionId));
 	}
 
+	@Override
+		public Transaction createTransaction(Transaction transaction) {
+		transactions.add(transaction);
+		return transaction;
+	 	}
+
+	@Override
+ 	public void updateTransaction(Transaction updatedTransaction) {
+	transactions.add(updatedTransaction);
+ 	}
+
+@Override
+	 	public  Optional<Transaction> getTransaction(String transactionId) {
+	 		return transactions.stream().filter(t -> t.getId().equals(transactionId)).findFirst();
+	 	}
 }

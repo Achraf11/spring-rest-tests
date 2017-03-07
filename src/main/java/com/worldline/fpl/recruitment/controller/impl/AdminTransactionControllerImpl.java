@@ -7,9 +7,11 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.worldline.fpl.recruitment.controller.AdminTransactionController;
+import com.worldline.fpl.recruitment.entity.Transaction;
 import com.worldline.fpl.recruitment.json.TransactionResponse;
 import com.worldline.fpl.recruitment.service.AdminTransactionService;
 
@@ -45,4 +47,22 @@ public class AdminTransactionControllerImpl implements
 		return new ResponseEntity<Page<TransactionResponse>>(HttpStatus.OK);
 	}
 
+	@Override
+	public ResponseEntity<Transaction> createTransaction(
+			@PathVariable("accountId") String accountId,
+			@RequestBody Transaction transaction) {
+		Transaction newTransaction = adminTransactionService.createTransaction(
+				accountId, transaction);
+		return ResponseEntity.status(HttpStatus.CREATED).body(newTransaction);
+	}
+
+	@Override
+	public ResponseEntity<Transaction> updateTransaction(
+			@PathVariable("accountId") String accountId,
+			@PathVariable("transactionId") String transactionId,
+			@RequestBody Transaction updateTransaction) {
+		adminTransactionService.updateTransaction(accountId, transactionId,
+				updateTransaction);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+	}
 }
