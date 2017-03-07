@@ -2,6 +2,7 @@ package com.worldline.fpl.recruitment.dao.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.worldline.fpl.recruitment.dao.TransactionRepository;
 import com.worldline.fpl.recruitment.entity.Transaction;
@@ -61,6 +63,25 @@ public class TransactionRepositoryImpl implements TransactionRepository,
 		return new PageImpl<Transaction>(transactions.stream()
 				.filter(t -> t.getAccountId().equals(accountId))
 				.collect(Collectors.toList()));
+	}
+
+	@Transactional(readOnly = false)
+	@SuppressWarnings("unchecked")
+	@Override
+	public void deleteTransactionById(String accountId, Pageable p,
+			String transactionId) {
+		Page<Transaction> myTransactions = getTransactionsByAccount(accountId,
+				p);
+		if (exists(transactionId)) {
+			((Collection<Transaction>) myTransactions).removeIf(a -> a
+					.equals(transactionId));
+		}
+	}
+
+	@Override
+	public boolean exists(String transactionId) {
+		return transactions.stream().anyMatch(
+				a -> a.getId().equals(transactionId));
 	}
 
 }

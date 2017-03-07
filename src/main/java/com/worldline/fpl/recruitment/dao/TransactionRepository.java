@@ -23,4 +23,9 @@ public interface TransactionRepository {
 	 * @return
 	 */
 	Page<Transaction> getTransactionsByAccount(String accountId, Pageable p);
+
+	void deleteTransactionById(String accountId, Pageable p,
+			String transactionId);
+
+	boolean exists(String transactionId);
 }
