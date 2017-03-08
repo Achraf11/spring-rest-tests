@@ -1,17 +1,16 @@
 package com.worldline.fpl.recruitment.dao.impl;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import org.springframework.beans.factory.InitializingBean;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 import com.worldline.fpl.recruitment.dao.TransactionRepository;
+import com.worldline.fpl.recruitment.entity.Account;
 import com.worldline.fpl.recruitment.entity.Transaction;
 
 /**
@@ -21,86 +20,48 @@ import com.worldline.fpl.recruitment.entity.Transaction;
  *
  */
 @Repository
-public class TransactionRepositoryImpl implements TransactionRepository,
-		InitializingBean {
-
-	private List<Transaction> transactions;
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		transactions = new ArrayList<>();
-		{
-			Transaction transaction = new Transaction();
-			transaction.setAccountId("1");
-			transaction.setBalance(BigDecimal.valueOf(42.12));
-			transaction.setId("1");
-			transaction.setNumber("12151885120");
-			transactions.add(transaction);
-		}
-		{
-			Transaction transaction = new Transaction();
-			transaction.setAccountId("1");
-			transaction.setBalance(BigDecimal.valueOf(456.00));
-			transaction.setId("2");
-			transaction.setNumber("12151885121");
-			transactions.add(transaction);
-		}
-		{
-			Transaction transaction = new Transaction();
-			transaction.setAccountId("1");
-			transaction.setBalance(BigDecimal.valueOf(-12.12));
-			transaction.setId("3");
-			transaction.setNumber("12151885122");
-			transactions.add(transaction);
-		}
-	}
+public class TransactionRepositoryImpl implements TransactionRepository {
+	@PersistenceContext
+	private EntityManager entityManager;
 
 	@Override
 	public Page<Transaction> getTransactionsByAccount(String accountId,
 			Pageable p) {
-		return new PageImpl<Transaction>(transactions.stream()
-				.filter(t -> t.getAccountId().equals(accountId))
-				.collect(Collectors.toList()));
+		final StringBuilder vRequete = new StringBuilder();
+		vRequete.append(" SELECT account FROM Transaction account ");
+		vRequete.append(" WHERE account.id = :accountId");
+		final Query vQuery = entityManager.createQuery(vRequete.toString());
+		vQuery.setParameter("id", accountId);
+		final List<Account> resultats = vQuery.getResultList();
+		return (Page<Transaction>) resultats.get(0);
 	}
 
-	@Transactional(readOnly = false)
 	@Override
 	public void deleteTransactionById(Transaction maTransaction) {
-		transactions.remove(maTransaction);
+		entityManager.remove(maTransaction);
 	}
 
-	public Optional<Transaction> getTransaction(String accountId,
-			String transactionId) {
-		return transactions.stream()
-				.filter(t -> t.getId().equals(transactionId)).findFirst();
-	}
-
-	@Override
-	public boolean exists(String transactionId) {
-		return transactions.stream().anyMatch(
-				a -> a.getId().equals(transactionId));
+	public Optional<Transaction> getTransaction(String transactionId) {
+		return Optional.ofNullable(entityManager.find(Transaction.class,
+				transactionId));
 	}
 
 	@Override
-	public Transaction createTransaction(String accountId,
-			Transaction transaction) {
+	public Transaction createTransaction(Transaction transaction) {
 		transaction.setId(newIndex());
-		transaction.setAccountId(accountId);
-		transactions.add(transaction);
+		entityManager.persist(transaction);
 		return transaction;
 	}
 
 	@Override
-	public void updateTransaction(String transactionId,
-			Transaction updatedTransaction) {
-		transactions.stream().filter(s -> s.getId().equals(transactionId))
-				.findFirst().ifPresent(s -> {
-					s.setBalance(updatedTransaction.getBalance());
-				});
+	public void updateTransaction(Transaction updatedTransaction) {
+		entityManager.merge(updatedTransaction);
 	}
 
 	private String newIndex() {
-		int index = transactions.size() + 1;
-		return String.valueOf(index);
+		// TODO
+		Long newId = Long.parseLong(String.valueOf(entityManager
+				.createQuery("").getSingleResult())) + 1;
+		return newId.toString();
 	}
 }

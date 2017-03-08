@@ -26,19 +26,27 @@ public interface TransactionRepository {
 	 */
 	Page<Transaction> getTransactionsByAccount(String accountId, Pageable p);
 
+	/**
+	 *
+	 * @param maTransaction
+	 *            delete transaction
+	 */
 	void deleteTransactionById(Transaction maTransaction);
 
-	boolean exists(String transactionId);
-
-	Transaction createTransaction(String accountId, Transaction transaction);
+	/**
+	 *
+	 * @param transaction
+	 *            the created transaction
+	 */
+	Transaction createTransaction(Transaction transaction);
 
 	/**
 	 *
 	 * @param updatedTransaction
 	 *            the updated transaction
 	 */
-	void updateTransaction(String accountId, Transaction transaction);
 
-	Optional<Transaction> getTransaction(String accountId, String transactionId);
-
+	Optional<Transaction> getTransaction(String transactionId);
+	
+	void updateTransaction(Transaction updatedTransaction);
 }

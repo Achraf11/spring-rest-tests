@@ -3,7 +3,9 @@ package com.worldline.fpl.recruitment.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.worldline.fpl.recruitment.dao.TransactionRepository;
+import com.worldline.fpl.recruitment.entity.Account;
 import com.worldline.fpl.recruitment.entity.Transaction;
 import com.worldline.fpl.recruitment.exception.ServiceException;
 import com.worldline.fpl.recruitment.json.ErrorCode;
@@ -28,17 +30,17 @@ public class AdminTransactionService {
 	 *            the transaction id
 	 * @return
 	 */
-
+	@Transactional
 	public void deleteTransactionById(String accountId, String transactionId) {
 		if (!accountService.isAccountExist(accountId)) {
 			throw new ServiceException(ErrorCode.INVALID_ACCOUNT,
 					"Account doesn't exist");
 		}
 		Transaction transaction = transactionRepository.getTransaction(
-				accountId, transactionId).orElseThrow(
+				transactionId).orElseThrow(
 				() -> new ServiceException(ErrorCode.INVALID_TRANSACTION,
 						"Transaction doesn't exist"));
-		if (!transaction.getAccountId().equals(accountId)) {
+		if (!transaction.getAccount().getId().equals(accountId)) {
 			throw new ServiceException(ErrorCode.INVALID_TRANSACTION,
 					"Transaction doesn't exist");
 		}
@@ -56,18 +58,18 @@ public class AdminTransactionService {
 	 *            the Transaction object
 	 * @return
 	 */
-	@Transactional(readOnly = false)
+	@Transactional
 	public Transaction createTransaction(String accountId,
 			Transaction transaction) {
-		if (!accountService.isAccountExist(accountId)) {
-			throw new ServiceException(ErrorCode.INVALID_ACCOUNT,
-					"Account doesn't exist");
-		}
+		Account account = accountService.getAccount(accountId).orElseThrow(
+				() -> new ServiceException(ErrorCode.INVALID_ACCOUNT,
+						"Account doesn't exist"));
 		if (transaction == null || transaction.getBalance() == null) {
 			throw new ServiceException(ErrorCode.INVALID_TRANSACTION,
 					"Transaction isn't valid");
 		}
-		return transactionRepository.createTransaction(accountId, transaction);
+		transaction.setAccount(account);
+		return transactionRepository.createTransaction(transaction);
 	}
 
 	/**
@@ -92,14 +94,15 @@ public class AdminTransactionService {
 					"Transaction isn't valid");
 		}
 		Transaction transaction = transactionRepository.getTransaction(
-				accountId, transactionId).orElseThrow(
+				transactionId).orElseThrow(
 				() -> new ServiceException(ErrorCode.INVALID_TRANSACTION,
 						"Transaction Not Found"));
-		if (!transaction.getAccountId().equals(accountId)) {
+		if (!transaction.getAccount().getId().equals(accountId)) {
 			throw new ServiceException(ErrorCode.INVALID_TRANSACTION,
 					"Transaction isn't valid");
 		}
-		transactionRepository.updateTransaction(transactionId,
-				updatedTransaction);
+		updatedTransaction.setId(transactionId);
+		updatedTransaction.setAccount(transaction.getAccount());
+		transactionRepository.updateTransaction(updatedTransaction);
 	}
 }
