@@ -31,13 +31,14 @@ public interface TransactionRepository {
 
 	boolean exists(String transactionId);
 
-	Transaction createTransaction(Transaction transaction);
-	/**
-	 	 *
-	 	 * @param updatedTransaction
-	 	 *             the updated transaction
-	 	 */
-	 	void updateTransaction(Transaction updatedTransaction);
+	Transaction createTransaction(String accountId, Transaction transaction);
 
-	Optional<Transaction> getTransaction(String transactionId);
+	/**
+	 *
+	 * @param updatedTransaction
+	 *            the updated transaction
+	 */
+	void updateTransaction(String accountId, Transaction transaction);
+
+	Optional<Transaction> getTransaction(String accountId, String transactionId);
 }

@@ -58,11 +58,15 @@ public class AdminTransactionService {
 	@Transactional(readOnly = false)
 	public Transaction createTransaction(String accountId,
 			Transaction transaction) {
-		if (transaction == null) {
+		if (!accountService.isAccountExist(accountId)) {
+			throw new ServiceException(ErrorCode.INVALID_ACCOUNT,
+					"Account doesn't exist");
+		}
+		if (transaction == null || transaction.getBalance() == null) {
 			throw new ServiceException(ErrorCode.INVALID_TRANSACTION,
 					"Transaction isn't valid");
 		}
-		return transactionRepository.createTransaction(transaction);
+		return transactionRepository.createTransaction(accountId, transaction);
 	}
 
 	/**
@@ -86,10 +90,16 @@ public class AdminTransactionService {
 			throw new ServiceException(ErrorCode.INVALID_TRANSACTION,
 					"Transaction isn't valid");
 		}
-		Optional<Transaction> transaction = transactionRepository
-				.getTransaction(transactionId);
-		updatedTransaction.setId(transactionId);
-		transactionRepository.updateTransaction(updatedTransaction);
+		Transaction transaction = transactionRepository
+				.getTransaction(accountId, transactionId).orElseThrow(
+						                () -> new ServiceException(ErrorCode.INVALID_TRANSACTION,
+								                        "Transaction Not Found"));
+		if (!transaction.getAccountId().equals(accountId)) {
+			throw new ServiceException(ErrorCode.INVALID_TRANSACTION,
+					"Transaction isn't valid");
+		}
+		transactionRepository.updateTransaction(transactionId,
+				updatedTransaction);
 	}
 
 }
