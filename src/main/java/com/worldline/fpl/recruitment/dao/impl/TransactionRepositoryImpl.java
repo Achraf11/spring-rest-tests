@@ -10,7 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 import com.worldline.fpl.recruitment.dao.TransactionRepository;
 import com.worldline.fpl.recruitment.entity.Transaction;
 
@@ -63,7 +62,6 @@ public class TransactionRepositoryImpl implements TransactionRepository,
 				.collect(Collectors.toList()));
 	}
 
-	@Transactional(readOnly = false)
 	@Override
 	public void deleteTransactionById(Transaction maTransaction) {
 		transactions.remove(maTransaction);

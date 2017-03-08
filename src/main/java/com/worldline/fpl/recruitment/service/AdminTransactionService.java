@@ -31,16 +31,16 @@ public class AdminTransactionService {
 
 	public void deleteTransactionById(String accountId, String transactionId) {
 		if (!accountService.isAccountExist(accountId)) {
-			throw new ServiceException(ErrorCode.INVALID_ACCOUNT,
+			throw new ServiceException(ErrorCode.UNEXISTED_ACCOUNT,
 					"Account doesn't exist");
 		}
 		Transaction transaction = transactionRepository.getTransaction(
 				accountId, transactionId).orElseThrow(
-				() -> new ServiceException(ErrorCode.INVALID_TRANSACTION,
+				() -> new ServiceException(ErrorCode.UNEXISTED_TRANSACTION,
 						"Transaction doesn't exist"));
 		if (!transaction.getAccountId().equals(accountId)) {
-			throw new ServiceException(ErrorCode.INVALID_TRANSACTION,
-					"Transaction doesn't exist");
+			throw new ServiceException(ErrorCode.TRANSACTION_NOT_BELONG_ACCOUNT,
+					" Forbiden Transaction");
 		}
 		if (transactionId != null) {
 			transactionRepository.deleteTransactionById(transaction);
@@ -60,7 +60,7 @@ public class AdminTransactionService {
 	public Transaction createTransaction(String accountId,
 			Transaction transaction) {
 		if (!accountService.isAccountExist(accountId)) {
-			throw new ServiceException(ErrorCode.INVALID_ACCOUNT,
+			throw new ServiceException(ErrorCode.UNEXISTED_ACCOUNT,
 					"Account doesn't exist");
 		}
 		if (transaction == null || transaction.getBalance() == null) {
@@ -82,7 +82,7 @@ public class AdminTransactionService {
 	public void updateTransaction(String accountId, String transactionId,
 			Transaction updatedTransaction) {
 		if (!accountService.isAccountExist(accountId)) {
-			throw new ServiceException(ErrorCode.INVALID_ACCOUNT,
+			throw new ServiceException(ErrorCode.UNEXISTED_ACCOUNT,
 					"Account doesn't exist");
 		}
 		if (updatedTransaction == null
@@ -93,11 +93,11 @@ public class AdminTransactionService {
 		}
 		Transaction transaction = transactionRepository.getTransaction(
 				accountId, transactionId).orElseThrow(
-				() -> new ServiceException(ErrorCode.INVALID_TRANSACTION,
+				() -> new ServiceException(ErrorCode.UNEXISTED_TRANSACTION,
 						"Transaction Not Found"));
 		if (!transaction.getAccountId().equals(accountId)) {
-			throw new ServiceException(ErrorCode.INVALID_TRANSACTION,
-					"Transaction isn't valid");
+			throw new ServiceException(ErrorCode.TRANSACTION_NOT_BELONG_ACCOUNT,
+					"Forbiden Transaction");
 		}
 		transactionRepository.updateTransaction(transactionId,
 				updatedTransaction);
