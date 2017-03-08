@@ -1,5 +1,7 @@
 package com.worldline.fpl.recruitment.dao;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -24,8 +26,10 @@ public interface TransactionRepository {
 	 */
 	Page<Transaction> getTransactionsByAccount(String accountId, Pageable p);
 
-	void deleteTransactionById(String accountId, Pageable p,
-			String transactionId);
+	void deleteTransactionById(Transaction maTransaction);
 
 	boolean exists(String transactionId);
+
+	Optional<Transaction> getTransactionById(String accountId,
+			String transactionId);
 }
