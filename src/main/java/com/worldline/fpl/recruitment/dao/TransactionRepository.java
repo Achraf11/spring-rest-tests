@@ -26,8 +26,7 @@ public interface TransactionRepository {
 	 */
 	Page<Transaction> getTransactionsByAccount(String accountId, Pageable p);
 
-	void deleteTransactionById(String accountId, Pageable p,
-			String transactionId);
+	void deleteTransactionById(Transaction maTransaction);
 
 	boolean exists(String transactionId);
 
@@ -41,4 +40,5 @@ public interface TransactionRepository {
 	void updateTransaction(String accountId, Transaction transaction);
 
 	Optional<Transaction> getTransaction(String accountId, String transactionId);
+
 }
